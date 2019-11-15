@@ -1,6 +1,6 @@
-import pandas
 from sklearn import linear_model
 import pandas as pd
+import numpy as np
 
 data = pd.read_csv("drug_consumption.csv")
 train = data[['Alcohol','Cannabis','Cocaine','Crack','Ecstasy','Heroin','Ketamine','LSD','Meth','Mushrooms','Nicotine']]
@@ -21,3 +21,17 @@ print("theta_8 =", str(round(model.coef_[0][7], 2)), "(LSD)")
 print("theta_9 =", str(round(model.coef_[0][8], 2)), "(Meth)")
 print("theta_10 =", str(round(model.coef_[0][9], 2)), "(Mushrooms)")
 print("theta_11 =", str(round(model.coef_[0][10], 2)), "(Nicotine)")
+
+instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
+instance_to_predict = instance_to_predict.reshape(1, -1)
+prediction = model.predict(instance_to_predict)
+
+gender = ""
+
+if(prediction >= .5):
+         gender = "Male"
+if(prediction < .5):
+         gender = "Female"
+         
+
+print("predicted y value for x =", instance_to_predict, "is", prediction, "( ", gender, ")")
