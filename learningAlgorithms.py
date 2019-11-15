@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3.7.4
+
 from sklearn import linear_model
 import pandas as pd
 import numpy as np
@@ -24,14 +26,13 @@ print("theta_11 =", str(round(model.coef_[0][10], 2)), "(Nicotine)")
 
 instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
 instance_to_predict = instance_to_predict.reshape(1, -1)
-prediction = model.predict(instance_to_predict)
+logistic_regression_prediction = model.predict(instance_to_predict)
 
 gender = ""
 
-if(prediction >= .5):
+if(logistic_regression_prediction >= .5):
          gender = "Male"
-if(prediction < .5):
+if(logistic_regression_prediction < .5):
          gender = "Female"
          
-
-print("predicted y value for x =", instance_to_predict, "is", prediction, "( ", gender, ")")
+print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
