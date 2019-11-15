@@ -43,23 +43,23 @@ def linear_regression_algorithm():
     print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
 
 
-def decision_tree_algorithm():
+#def decision_tree_algorithm():
     #TODO
 
 
-def random_forest_algorithm():
+#def random_forest_algorithm():
     #TODO
 
 
-def k_fold_cross_validation():
+#def k_fold_cross_validation():
     #TODO
 
 
 def main():
     linear_regression_algorithm()
-    decision_tree_algorithm()
-    random_forest_algorithm()
-    k_fold_cross_validation()
+    #decision_tree_algorithm()
+    #random_forest_algorithm()
+    #k_fold_cross_validation()
 
 
 main()
