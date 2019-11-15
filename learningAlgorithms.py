@@ -1,18 +1,23 @@
 #!/usr/local/bin/python3.7.4
 
 from sklearn import linear_model
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 import numpy as np
 
 data = pd.read_csv("drug_consumption.csv")
-train = data[['Alcohol','Cannabis','Cocaine','Crack','Ecstasy','Heroin','Ketamine','LSD','Meth','Mushrooms','Nicotine']]
+train = data[['Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
+              'Nicotine']]
 label = data[['Gender']]
 
 
 def linear_regression_algorithm():
-    ''' @description
+    """ @description
             Uses the linear regression algorithm to predict gender of the consituent based on the drugs they'e consumed
-    '''
+        @author
+            Tristen, Justin
+    """
     model = linear_model.LinearRegression()
     model.fit(train, label)
 
@@ -35,33 +40,72 @@ def linear_regression_algorithm():
 
     gender = ""
 
-    if(logistic_regression_prediction >= .5):
-             gender = "Male"
-    if(logistic_regression_prediction < .5):
-             gender = "Female"
-             
+    if logistic_regression_prediction >= .5:
+        gender = "Male"
+    if logistic_regression_prediction < .5:
+        gender = "Female"
+
     print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
 
 
-#def decision_tree_algorithm():
-    #TODO
+def decision_tree_algorithm():
+    """ @description
+            Uses the decision tree algorithm to predict gender of the constituent based on the drugs they'e consumed
+        @author
+            Justin
+    """
+    lb = LabelEncoder()
+    data['alcohol_'] = lb.fit_transform(data['Alcohol'])
+    data['cannabis_'] = lb.fit_transform(data['Cannabis'])
+    data['cocaine_'] = lb.fit_transform(data['Cocaine'])
+    data['crack_'] = lb.fit_transform(data['Crack'])
+    data['ecstasy_'] = lb.fit_transform(data['Ecstasy'])
+    data['heroin_'] = lb.fit_transform(data['Heroin'])
+    data['ketamine_'] = lb.fit_transform(data['Ketamine'])
+    data['lsd_'] = lb.fit_transform(data['LSD'])
+    data['meth_'] = lb.fit_transform(data['Meth'])
+    data['nicotine_'] = lb.fit_transform(data['Nicotine'])
+    data['gender_'] = lb.fit_transform(data['Gender'])  # predict class
+
+    print(data)
+
+    # TODO these two lines are incorrect - need to update for use in our project - trying to figure it out (Justin)
+    # x = data.iloc[:, 5:9]  # row selector, column - ':' means all rows
+    # y = data.iloc[:, 9]  # row selector, column - ':' means all rows
+
+    # tree_classifier = DecisionTreeClassifier(criterion='entropy')
+    # tree_classifier.fit(x, y)
+
+    # prediction = tree_classifier.predict(np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6]).reshape(1, -1))
+    # print('Prediction to be male or female is', prediction, 'where 1 = male, 0 = female')
 
 
-#def random_forest_algorithm():
-    #TODO
+# def random_forest_algorithm():
+""" @description
+        Uses the random forest algorithm to predict gender of the constituent based on the drugs they'e consumed
+    @author
+        TODO
+"""
+# TODO
 
 
-#def k_fold_cross_validation():
-    #TODO
+# def k_fold_cross_validation():
+""" @description
+        Uses k-fold cross validation to predict gender of the constituent based on the drugs they'e consumed
+    @author
+        TODO
+"""
+# TODO
 
 
 def main():
+    """ @description
+        The main entry point for the program
+    """
     linear_regression_algorithm()
-    #decision_tree_algorithm()
-    #random_forest_algorithm()
-    #k_fold_cross_validation()
+    decision_tree_algorithm()
+    # random_forest_algorithm()
+    # k_fold_cross_validation()
 
 
 main()
-
-
