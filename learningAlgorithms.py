@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 
 data = pd.read_csv("drug_consumption.csv")
-train = data[['Alcohol','Cannabis','Cocaine','Crack','Ecstasy','Heroin','Ketamine','LSD','Meth','Mushrooms','Nicotine']]
+train = data[['Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
+              'Nicotine']]
 label = data[['Gender']]
 
 model = linear_model.LinearRegression()
@@ -30,9 +31,9 @@ logistic_regression_prediction = model.predict(instance_to_predict)
 
 gender = ""
 
-if(logistic_regression_prediction >= .5):
-         gender = "Male"
-if(logistic_regression_prediction < .5):
-         gender = "Female"
-         
-print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
+if (logistic_regression_prediction >= .5):
+    gender = "Male"
+if (logistic_regression_prediction < .5):
+    gender = "Female"
+
+print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "(", gender, ")")
