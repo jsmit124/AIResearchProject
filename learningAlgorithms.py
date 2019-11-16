@@ -3,6 +3,8 @@
 from sklearn import linear_model
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
 
@@ -80,32 +82,67 @@ def decision_tree_algorithm():
     # print('Prediction to be male or female is', prediction, 'where 1 = male, 0 = female')
 
 
-# def random_forest_algorithm():
-""" @description
-        Uses the random forest algorithm to predict gender of the constituent based on the drugs they'e consumed
-    @author
-        TODO
-"""
-# TODO
+def random_forest_algorithm():
+    """ @description
+            Uses the random forest algorithm to predict gender of the constituent based on the drugs they've consumed
+        @author
+            Aaron Merrell
+    """
+    classifier = RandomForestClassifier(n_estimators=1000)
+    the_label = np.ravel(label)
+    classifier.fit(train, the_label)
+    instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
+    instance_to_predict = instance_to_predict.reshape(1, -1)
+    y_pred = classifier.predict(instance_to_predict)
+
+    gender = ''
+
+    if y_pred == 1:
+        gender = 'male'
+    if y_pred == 0:
+        gender = 'female'
+
+    print("predicted y value for x =", instance_to_predict, "is", y_pred, "( ", gender, ")")
+
+def k_fold_cross_validation():
+    """ @description
+            Uses k-fold cross validation to test the accuracy of the models
+        @author
+            Aaron Merrell
+    """
+    # scores = []
+    # folds = StratifiedKFold(n_splits=30)
+    # for train_index, test_index in folds.split(data):
 
 
-# def k_fold_cross_validation():
-""" @description
-        Uses k-fold cross validation to predict gender of the constituent based on the drugs they'e consumed
+
+
+def get_score(model, x_train, x_test, y_train, y_test):
+    """
+    @description
+        Gets the accuracy score for the madel
     @author
-        TODO
-"""
-# TODO
+        Aaron Merrell
+    @:parameter
+    :param model: The model to test
+    :param x_train: The features to train model by
+    :param x_test: The features to test model by
+    :param y_train: The label to train the model by
+    :param y_test: The label to test the model by
+    :return: The accuracy of the model
+    """
+    model.fit(x_train, y_train)
+    return model.score(x_test, y_test)
 
 
 def main():
     """ @description
         The main entry point for the program
     """
-    linear_regression_algorithm()
-    decision_tree_algorithm()
-    # random_forest_algorithm()
-    # k_fold_cross_validation()
+    #linear_regression_algorithm()
+    #decision_tree_algorithm()
+    #random_forest_algorithm()
+    k_fold_cross_validation()
 
 
 main()
