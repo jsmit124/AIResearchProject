@@ -50,8 +50,9 @@ def linear_regression_algorithm():
 
     score = k_fold_cross_validation(model)
 
-    print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
+    print("Predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "(", gender, ")")
     print('Linear Regression accuracy is: {}%'.format(round(score, 1)))
+
 
 def decision_tree_algorithm():
     """ @description
@@ -69,20 +70,22 @@ def decision_tree_algorithm():
     data['ketamine_'] = lb.fit_transform(data['Ketamine'])
     data['lsd_'] = lb.fit_transform(data['LSD'])
     data['meth_'] = lb.fit_transform(data['Meth'])
+    data['mushrooms_'] = lb.fit_transform(data['Mushrooms'])
     data['nicotine_'] = lb.fit_transform(data['Nicotine'])
     data['gender_'] = lb.fit_transform(data['Gender'])  # predict class
 
-    print(data)
+    x = data.iloc[:, [12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
+    y = data.iloc[:, 31]
+    
+    tree_classifier = DecisionTreeClassifier(criterion='entropy')
+    tree_classifier.fit(x, y)
 
-    # TODO these two lines are incorrect - need to update for use in our project - trying to figure it out (Justin)
-    # x = data.iloc[:, 5:9]  # row selector, column - ':' means all rows
-    # y = data.iloc[:, 9]  # row selector, column - ':' means all rows
-
-    # tree_classifier = DecisionTreeClassifier(criterion='entropy')
-    # tree_classifier.fit(x, y)
-
-    # prediction = tree_classifier.predict(np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6]).reshape(1, -1))
-    # print('Prediction to be male or female is', prediction, 'where 1 = male, 0 = female')
+    instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
+    prediction = tree_classifier.predict(instance_to_predict.reshape(1, -1))
+    score = k_fold_cross_validation(tree_classifier)
+    
+    print('Prediction to be male or female is', prediction, 'where 1 = Male, 0 = Female')
+    print('Decision Tree accuracy is: {}%'.format(round(score, 1)))
 
 
 def random_forest_algorithm():
@@ -101,14 +104,15 @@ def random_forest_algorithm():
     gender = ''
 
     if y_pred == 1:
-        gender = 'male'
+        gender = 'Male'
     if y_pred == 0:
-        gender = 'female'
+        gender = 'Female'
 
     score = k_fold_cross_validation(classifier)
 
-    print("predicted y value for x =", instance_to_predict, "is", y_pred, "( ", gender, ")")
+    print("Predicted y value for x =", instance_to_predict, "is", y_pred, "(", gender, ")")
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
+
 
 def k_fold_cross_validation(model):
     """ @description
@@ -127,9 +131,6 @@ def k_fold_cross_validation(model):
         avg += i
     avg = (avg / len(scores)) * 100
     return avg
-
-
-
 
 
 def get_score(model, x_train, x_test, y_train, y_test):
@@ -154,10 +155,14 @@ def main():
     """ @description
         The main entry point for the program
     """
+    print("LINEAR REGRESSION", sep="---")
     linear_regression_algorithm()
-    #decision_tree_algorithm()
+    print("")
+    print("DECISION TREE", sep="---")
+    decision_tree_algorithm()
+    print("")
+    print("RANDOM FOREST", sep="---")
     random_forest_algorithm()
-
 
 
 main()
