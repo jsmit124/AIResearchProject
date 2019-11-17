@@ -1,10 +1,11 @@
 #!/usr/local/bin/python3.7.4
 
+
 from sklearn import linear_model
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import KFold
 import pandas as pd
 import numpy as np
 
@@ -47,8 +48,10 @@ def linear_regression_algorithm():
     if logistic_regression_prediction < .5:
         gender = "Female"
 
-    print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
+    score = k_fold_cross_validation(model)
 
+    print("predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "( ", gender, ")")
+    print('Linear Regression accuracy is: {}%'.format(round(score, 1)))
 
 def decision_tree_algorithm():
     """ @description
@@ -102,17 +105,29 @@ def random_forest_algorithm():
     if y_pred == 0:
         gender = 'female'
 
-    print("predicted y value for x =", instance_to_predict, "is", y_pred, "( ", gender, ")")
+    score = k_fold_cross_validation(classifier)
 
-def k_fold_cross_validation():
+    print("predicted y value for x =", instance_to_predict, "is", y_pred, "( ", gender, ")")
+    print('Random forest accuracy is: {}%'.format(round(score, 1)))
+
+def k_fold_cross_validation(model):
     """ @description
             Uses k-fold cross validation to test the accuracy of the models
         @author
             Aaron Merrell
     """
-    # scores = []
-    # folds = StratifiedKFold(n_splits=30)
-    # for train_index, test_index in folds.split(data):
+    scores = []
+    folds = KFold(n_splits=10)
+    for train_index, test_index in folds.split(train, label):
+        x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
+        scores.append(get_score(model, x_train, x_test, y_train, y_test))
+
+    avg = 0
+    for i in scores:
+        avg += i
+    avg = (avg / len(scores)) * 100
+    return avg
+
 
 
 
@@ -131,7 +146,7 @@ def get_score(model, x_train, x_test, y_train, y_test):
     :param y_test: The label to test the model by
     :return: The accuracy of the model
     """
-    model.fit(x_train, y_train)
+    model.fit(x_train, np.ravel(y_train))
     return model.score(x_test, y_test)
 
 
@@ -139,10 +154,10 @@ def main():
     """ @description
         The main entry point for the program
     """
-    #linear_regression_algorithm()
+    linear_regression_algorithm()
     #decision_tree_algorithm()
-    #random_forest_algorithm()
-    k_fold_cross_validation()
+    random_forest_algorithm()
+
 
 
 main()
