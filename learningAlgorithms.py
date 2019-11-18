@@ -56,7 +56,7 @@ def linear_regression_algorithm():
 
 def decision_tree_algorithm():
     """ @description
-            Uses the decision tree algorithm to predict gender of the constituent based on the drugs they'e consumed
+            Uses the decision tree algorithm to predict gender of the constituent based on the drugs they've consumed
         @author
             Justin
     """
@@ -76,14 +76,14 @@ def decision_tree_algorithm():
 
     x = data.iloc[:, [12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
     y = data.iloc[:, 31]
-    
+
     tree_classifier = DecisionTreeClassifier(criterion='entropy')
     tree_classifier.fit(x, y)
 
     instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
     prediction = tree_classifier.predict(instance_to_predict.reshape(1, -1))
     score = k_fold_cross_validation(tree_classifier)
-    
+
     print('Prediction to be male or female is', prediction, 'where 1 = Male, 0 = Female')
     print('Decision Tree accuracy is: {}%'.format(round(score, 1)))
 
