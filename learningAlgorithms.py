@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 
 data = pd.read_csv("drug_consumption.csv")
+
+#TODO add age, education, country, ethnicity to predict gender
 train = data[['Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
               'Nicotine']]
 label = data[['Gender']]
@@ -21,6 +23,7 @@ def linear_regression_algorithm():
         @author
             Tristen, Justin
     """
+    #TODO change to logistic regression
     model = linear_model.LinearRegression()
     model.fit(train, label)
 
@@ -121,6 +124,8 @@ def k_fold_cross_validation(model):
             Aaron Merrell
     """
     scores = []
+    #TODO change to stratified
+    #TODO play with k
     folds = KFold(n_splits=10)
     for train_index, test_index in folds.split(train, label):
         x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
