@@ -5,14 +5,13 @@ from sklearn import linear_model
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 import pandas as pd
 import numpy as np
 
 data = pd.read_csv("drug_consumption.csv")
 
-#TODO add age, education, country, ethnicity to predict gender
-train = data[['Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
+train = data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
               'Nicotine']]
 label = data[['Gender']]
 
@@ -64,6 +63,10 @@ def decision_tree_algorithm():
             Justin
     """
     lb = LabelEncoder()
+    data['age_'] = lb.fit_transform(data['Age'])
+    data['education_'] = lb.fit_transform(data['Education'])
+    data['country_'] = lb.fit_transform(data['Country'])
+    data['ethnicity_'] = lb.fit_transform(data['Ethnicity'])
     data['alcohol_'] = lb.fit_transform(data['Alcohol'])
     data['cannabis_'] = lb.fit_transform(data['Cannabis'])
     data['cocaine_'] = lb.fit_transform(data['Cocaine'])
@@ -77,17 +80,17 @@ def decision_tree_algorithm():
     data['nicotine_'] = lb.fit_transform(data['Nicotine'])
     data['gender_'] = lb.fit_transform(data['Gender'])  # predict class
 
-    x = data.iloc[:, [12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
+    x = data.iloc[:, [1, 2, 3, 4, 12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
     y = data.iloc[:, 31]
 
     tree_classifier = DecisionTreeClassifier(criterion='entropy')
     tree_classifier.fit(x, y)
 
-    instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
-    prediction = tree_classifier.predict(instance_to_predict.reshape(1, -1))
+    # instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
+    # prediction = tree_classifier.predict(instance_to_predict.reshape(1, -1))
     score = k_fold_cross_validation(tree_classifier)
 
-    print('Prediction to be male or female is', prediction, 'where 1 = Male, 0 = Female')
+    # print('Prediction to be male or female is', prediction, 'where 1 = Male, 0 = Female')
     print('Decision Tree accuracy is: {}%'.format(round(score, 1)))
 
 
@@ -100,20 +103,20 @@ def random_forest_algorithm():
     classifier = RandomForestClassifier(n_estimators=1000)
     the_label = np.ravel(label)
     classifier.fit(train, the_label)
-    instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
-    instance_to_predict = instance_to_predict.reshape(1, -1)
-    y_pred = classifier.predict(instance_to_predict)
+    # instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
+    # instance_to_predict = instance_to_predict.reshape(1, -1)
+    # y_pred = classifier.predict(instance_to_predict)
 
-    gender = ''
-
-    if y_pred == 1:
-        gender = 'Male'
-    if y_pred == 0:
-        gender = 'Female'
+    # gender = ''
+    #
+    # if y_pred == 1:
+    #     gender = 'Male'
+    # if y_pred == 0:
+    #     gender = 'Female'
 
     score = k_fold_cross_validation(classifier)
 
-    print("Predicted y value for x =", instance_to_predict, "is", y_pred, "(", gender, ")")
+    # print("Predicted y value for x =", instance_to_predict, "is", y_pred, "(", gender, ")")
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
 
 
@@ -126,7 +129,7 @@ def k_fold_cross_validation(model):
     scores = []
     #TODO change to stratified
     #TODO play with k
-    folds = KFold(n_splits=10)
+    folds = StratifiedKFold(n_splits=10)
     for train_index, test_index in folds.split(train, label):
         x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
         scores.append(get_score(model, x_train, x_test, y_train, y_test))
@@ -160,8 +163,8 @@ def main():
     """ @description
         The main entry point for the program
     """
-    print("LINEAR REGRESSION", sep="---")
-    linear_regression_algorithm()
+    # print("LINEAR REGRESSION", sep="---")
+    # linear_regression_algorithm()
     print("")
     print("DECISION TREE", sep="---")
     decision_tree_algorithm()
