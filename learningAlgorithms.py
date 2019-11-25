@@ -1,13 +1,16 @@
 #!/usr/local/bin/python3.7.4
 
+import warnings
 
-from sklearn import linear_model
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold
-import pandas as pd
 import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, GridSearchCV
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier
+
+warnings.filterwarnings("ignore")
 
 data = pd.read_csv("drug_consumption.csv")
 
@@ -16,43 +19,17 @@ train = data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis',
 label = data[['Gender']]
 
 
-def linear_regression_algorithm():
+def logistic_regression_algorithm():
     """ @description
-            Uses the linear regression algorithm to predict gender of the consituent based on the drugs they'e consumed
+            Uses the logistic regression algorithm to predict gender of the consituent based on the drugs they'e consumed
         @author
             Tristen, Justin
     """
-    #TODO change to logistic regression
-    model = linear_model.LinearRegression()
-    model.fit(train, label)
-
-    print("theta_0 =", str(round(model.intercept_[0], 2)), "(intercept)")
-    print("theta_1 =", str(round(model.coef_[0][0], 2)), "(Alcohol)")
-    print("theta_2 =", str(round(model.coef_[0][1], 2)), "(Cannabis)")
-    print("theta_3 =", str(round(model.coef_[0][2], 2)), "(Cocaine)")
-    print("theta_4 =", str(round(model.coef_[0][3], 2)), "(Crack)")
-    print("theta_5 =", str(round(model.coef_[0][4], 2)), "(Ecstasy)")
-    print("theta_6 =", str(round(model.coef_[0][5], 2)), "(Heroin)")
-    print("theta_7 =", str(round(model.coef_[0][6], 2)), "(Ketamine)")
-    print("theta_8 =", str(round(model.coef_[0][7], 2)), "(LSD)")
-    print("theta_9 =", str(round(model.coef_[0][8], 2)), "(Meth)")
-    print("theta_10 =", str(round(model.coef_[0][9], 2)), "(Mushrooms)")
-    print("theta_11 =", str(round(model.coef_[0][10], 2)), "(Nicotine)")
-
-    instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
-    instance_to_predict = instance_to_predict.reshape(1, -1)
-    logistic_regression_prediction = model.predict(instance_to_predict)
-
-    gender = ""
-
-    if logistic_regression_prediction >= .5:
-        gender = "Male"
-    if logistic_regression_prediction < .5:
-        gender = "Female"
+    model = LogisticRegression(solver='liblinear', penalty='l2', C=0.001)
+    # model.fit(train, label)
 
     score = k_fold_cross_validation(model)
 
-    print("Predicted y value for x =", instance_to_predict, "is", logistic_regression_prediction, "(", gender, ")")
     print('Linear Regression accuracy is: {}%'.format(round(score, 1)))
 
 
@@ -83,14 +60,11 @@ def decision_tree_algorithm():
     x = data.iloc[:, [1, 2, 3, 4, 12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
     y = data.iloc[:, 31]
 
-    tree_classifier = DecisionTreeClassifier(criterion='entropy')
-    tree_classifier.fit(x, y)
+    tree_classifier = DecisionTreeClassifier(criterion='gini', max_depth=3, max_leaf_nodes=10)
+    # tree_classifier.fit(x, y)
 
-    # instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
-    # prediction = tree_classifier.predict(instance_to_predict.reshape(1, -1))
     score = k_fold_cross_validation(tree_classifier)
 
-    # print('Prediction to be male or female is', prediction, 'where 1 = Male, 0 = Female')
     print('Decision Tree accuracy is: {}%'.format(round(score, 1)))
 
 
@@ -100,23 +74,12 @@ def random_forest_algorithm():
         @author
             Aaron Merrell
     """
-    classifier = RandomForestClassifier(n_estimators=1000)
+    classifier = RandomForestClassifier(criterion='gini', max_depth=4, n_estimators=10)
     the_label = np.ravel(label)
-    classifier.fit(train, the_label)
-    # instance_to_predict = np.array([6, 3, 3, 0, 4, 0, 2, 3, 0, 3, 6])
-    # instance_to_predict = instance_to_predict.reshape(1, -1)
-    # y_pred = classifier.predict(instance_to_predict)
-
-    # gender = ''
-    #
-    # if y_pred == 1:
-    #     gender = 'Male'
-    # if y_pred == 0:
-    #     gender = 'Female'
+    # classifier.fit(train, the_label)
 
     score = k_fold_cross_validation(classifier)
 
-    # print("Predicted y value for x =", instance_to_predict, "is", y_pred, "(", gender, ")")
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
 
 
@@ -127,7 +90,6 @@ def k_fold_cross_validation(model):
             Aaron Merrell
     """
     scores = []
-    #TODO change to stratified
     #TODO play with k
     folds = StratifiedKFold(n_splits=10)
     for train_index, test_index in folds.split(train, label):
@@ -159,18 +121,58 @@ def get_score(model, x_train, x_test, y_train, y_test):
     return model.score(x_test, y_test)
 
 
+def grid_search_logistic():
+    model = LogisticRegression()
+    param_grid = [{'solver': ['newton-cg', 'lbfgs', 'sag', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l2', 'none']},
+                  {'solver': ['liblinear', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l1', 'l2']}]
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_decision():
+    model = DecisionTreeClassifier()
+    param_grid = {'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'max_leaf_nodes': [5, 10, 20, 50, 100]}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_forest():
+    model = RandomForestClassifier()
+    param_grid = { 'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'n_estimators': [10, 30, 50, 70, 90, 100, 300, 500, 700, 900, 1000]}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+
 def main():
     """ @description
         The main entry point for the program
     """
-    # print("LINEAR REGRESSION", sep="---")
-    # linear_regression_algorithm()
+    print("LOGISTIC REGRESSION", sep="---")
+    logistic_regression_algorithm()
+    # grid_search_logistic()
     print("")
     print("DECISION TREE", sep="---")
     decision_tree_algorithm()
+    # grid_search_decision()
     print("")
     print("RANDOM FOREST", sep="---")
     random_forest_algorithm()
+    # grid_search_forest()
 
 
 main()
+
+
+# folds                 2      3      5      7      9       10     15     20     50     100
+# logistic regression  65.5   65.6   65.5   65.6   65.8    65.9   65.9   66.0   65.9   66.0
+# decision tree        61.4   65.0   64.7   65.8   64.7    65.0   64.4   65.7   64.8   65.5
+# random forest        65.3   64.6   64.9   65.5   65.9    65.7   65.6   66.0   66.4   65.8
+
+# hyperparameters tuned with grid search
+# logistic regression {'C': 0.001, 'penalty': l2, 'solver': liblinear}
+# decision tree {'criterion': gini, 'max_depth': 3, 'max_leaf_nodes': 10}
+# random forest {'criterion: 'gini', 'max_depth': 4, 'n_estimators': 10}
