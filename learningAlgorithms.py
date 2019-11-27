@@ -4,10 +4,14 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 warnings.filterwarnings("ignore")
@@ -82,6 +86,43 @@ def random_forest_algorithm():
 
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
 
+def svm_algorithm():
+    svc = SVC()
+    the_label = np.ravel(label)
+    # svc.fit(train, the_label)
+
+    score = k_fold_cross_validation(svc)
+
+    print('svm accuracy is: {}%'.format(round(score, 1)))
+
+def knn_algorithm():
+    knn = KNeighborsClassifier(algorithm='ball_tree', leaf_size=6, metric='minkowski', n_neighbors=25, p=2, weights='uniform')
+    the_label = np.ravel(label)
+    # knn.fit(train, the_label)
+
+    score = k_fold_cross_validation(knn)
+
+    print('knn accuracy is: {}%'.format(round(score, 1)))
+
+def gaussian_algorithm():
+    gnb = GaussianNB()
+    the_label = np.ravel(label)
+    # gnb.fit(train, the_label)
+
+    score = k_fold_cross_validation(gnb)
+
+    print('gaussian accuracy is: {}%'.format(round(score, 1)))
+
+def linear_discriminant_algorithm():
+    lda = LinearDiscriminantAnalysis(solver='svd')
+    the_label = np.ravel(label)
+    # lda.fit(train, the_label)
+
+    score = k_fold_cross_validation(lda)
+
+    print('Random forest accuracy is: {}%'.format(round(score, 1)))
+
+
 
 def k_fold_cross_validation(model):
     """ @description
@@ -90,8 +131,7 @@ def k_fold_cross_validation(model):
             Aaron Merrell
     """
     scores = []
-    #TODO play with k
-    folds = StratifiedKFold(n_splits=10)
+    folds = StratifiedKFold(n_splits=100)
     for train_index, test_index in folds.split(train, label):
         x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
         scores.append(get_score(model, x_train, x_test, y_train, y_test))
@@ -140,7 +180,34 @@ def grid_search_decision():
 
 def grid_search_forest():
     model = RandomForestClassifier()
-    param_grid = { 'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'n_estimators': [10, 30, 50, 70, 90, 100, 300, 500, 700, 900, 1000]}
+    param_grid = { 'criterion': ['gini'], 'max_depth': [3, 4, 5, 6], 'n_estimators': np.arange(1, 1001, 10)}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_svm():
+    model = SVC()
+    param_grid = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid', ], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'gamma': [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_knn():
+    model = KNeighborsClassifier()
+    param_grid = { 'n_neighbors': np.arange(1, 51), 'weights': ['uniform', 'distance'],
+                   'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'], 'leaf_size': np.arange(1, 51),
+                   'p': [1, 2], 'metric': ['minkowski']}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(label)
+    best_clf = clf.fit(train, the_label)
+    print(best_clf.best_params_)
+
+
+def grid_search_linear_discriminant():
+    model = LinearDiscriminantAnalysis()
+    param_grid = { 'solver': ['svd', 'lsqr', 'eigen']}
     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
     the_label = np.ravel(label)
     best_clf = clf.fit(train, the_label)
@@ -151,18 +218,32 @@ def main():
     """ @description
         The main entry point for the program
     """
-    print("LOGISTIC REGRESSION", sep="---")
-    logistic_regression_algorithm()
-    # grid_search_logistic()
+    # print("LOGISTIC REGRESSION", sep="---")
+    # # logistic_regression_algorithm()
+    # # grid_search_logistic()
+    # print("")
+    # print("DECISION TREE", sep="---")
+    # # decision_tree_algorithm()
+    # # grid_search_decision()
+    # print("")
+    # print("RANDOM FOREST", sep="---")
+    # # random_forest_algorithm()
+    # # grid_search_forest()
+    # print("")
+    print("SVC", sep="---")
+    svm_algorithm()
+    # grid_search_svm()
     print("")
-    print("DECISION TREE", sep="---")
-    decision_tree_algorithm()
-    # grid_search_decision()
+    print("KNN", sep="---")
+    knn_algorithm()
+    # grid_search_knn()
     print("")
-    print("RANDOM FOREST", sep="---")
-    random_forest_algorithm()
-    # grid_search_forest()
-
+    print("LINEAR DISCRIMINANT", sep="---")
+    linear_discriminant_algorithm()
+    # grid_search_linear_discriminant()
+    print("")
+    print("GAUSSIAN", sep="---")
+    gaussian_algorithm()
 
 main()
 
@@ -171,8 +252,14 @@ main()
 # logistic regression  65.5   65.6   65.5   65.6   65.8    65.9   65.9   66.0   65.9   66.0
 # decision tree        61.4   65.0   64.7   65.8   64.7    65.0   64.4   65.7   64.8   65.5
 # random forest        65.3   64.6   64.9   65.5   65.9    65.7   65.6   66.0   66.4   65.8
+# svc                  65.4   65.3   65.7   66.6   66.7    66.2   66.0   66.2   66.7   66.9
+# knn                  63.6   64.1   65.3   65.0   65.2    65.2   65.1   64.8   64.9   65.1
+# linear_discriminant  64.2   64.3   64.5   65.1   65.2    65.3   65.5   65.3   65.4   65.6
+# gaussian             63.7   63.8   63.8   63.9   64.1    64.2   64.0   64.1   64.0   64.2
 
 # hyperparameters tuned with grid search
 # logistic regression {'C': 0.001, 'penalty': l2, 'solver': liblinear}
 # decision tree {'criterion': gini, 'max_depth': 3, 'max_leaf_nodes': 10}
 # random forest {'criterion: 'gini', 'max_depth': 4, 'n_estimators': 10}
+# knn {'algorithm': 'ball_tree', 'leaf_size': 6, 'metric': 'minkowski', 'n_neighbors': 25, 'p': 2, 'weights': 'uniform'}
+# linear_discriminant {'solver': 'svd'}
