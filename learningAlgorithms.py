@@ -73,10 +73,12 @@ def decision_tree_algorithm():
 
 
 def random_forest_algorithm():
-    """ @description
-            Uses the random forest algorithm to predict gender of the constituent based on the drugs they've consumed
-        @author
-            Aaron Merrell
+    """
+     @description
+        Uses the random forest algorithm to predict gender of the constituent based on the drugs they've consumed
+     @author
+        Aaron Merrell
+     :return: The accuracy of the model.
     """
     classifier = RandomForestClassifier(criterion='gini', max_depth=4, n_estimators=10)
     the_label = np.ravel(label)
@@ -87,6 +89,13 @@ def random_forest_algorithm():
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
 
 def svm_algorithm():
+    """
+    @description
+        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
+    @author
+        Aaron Merrell
+    :return: The accuracy of the model.
+    """
     svc = SVC()
     the_label = np.ravel(label)
     # svc.fit(train, the_label)
@@ -96,6 +105,13 @@ def svm_algorithm():
     print('svm accuracy is: {}%'.format(round(score, 1)))
 
 def knn_algorithm():
+    """
+    @description
+        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
+    @author
+        Aaron Merrell
+    :return: The accuracy of the model.
+    """
     knn = KNeighborsClassifier(algorithm='ball_tree', leaf_size=6, metric='minkowski', n_neighbors=25, p=2, weights='uniform')
     the_label = np.ravel(label)
     # knn.fit(train, the_label)
@@ -105,6 +121,13 @@ def knn_algorithm():
     print('knn accuracy is: {}%'.format(round(score, 1)))
 
 def gaussian_algorithm():
+    """
+    @description
+        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
+    @author
+        Aaron Merrell
+    :return: The accuracy of the model.
+    """
     gnb = GaussianNB()
     the_label = np.ravel(label)
     # gnb.fit(train, the_label)
@@ -114,6 +137,13 @@ def gaussian_algorithm():
     print('gaussian accuracy is: {}%'.format(round(score, 1)))
 
 def linear_discriminant_algorithm():
+    """
+    @description
+        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
+    @author
+        Aaron Merrell
+    :return: The accuracy of the model.
+    """
     lda = LinearDiscriminantAnalysis(solver='svd')
     the_label = np.ravel(label)
     # lda.fit(train, the_label)
@@ -125,10 +155,13 @@ def linear_discriminant_algorithm():
 
 
 def k_fold_cross_validation(model):
-    """ @description
-            Uses k-fold cross validation to test the accuracy of the models
-        @author
-            Aaron Merrell
+    """
+    @description
+        Uses k-fold cross validation to test the accuracy of the models
+    @author
+        Aaron Merrell
+    :param model: The model being scored.
+    :return: the average score.
     """
     scores = []
     folds = StratifiedKFold(n_splits=100)
@@ -162,6 +195,13 @@ def get_score(model, x_train, x_test, y_train, y_test):
 
 
 def grid_search_logistic():
+    """
+    @description
+        Finds the best parameters for the logistic algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = LogisticRegression()
     param_grid = [{'solver': ['newton-cg', 'lbfgs', 'sag', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l2', 'none']},
                   {'solver': ['liblinear', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l1', 'l2']}]
@@ -171,6 +211,13 @@ def grid_search_logistic():
     print(best_clf.best_params_)
 
 def grid_search_decision():
+    """
+    @description
+        Finds the best parameters for the decision tree algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = DecisionTreeClassifier()
     param_grid = {'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'max_leaf_nodes': [5, 10, 20, 50, 100]}
     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
@@ -179,6 +226,13 @@ def grid_search_decision():
     print(best_clf.best_params_)
 
 def grid_search_forest():
+    """
+    @description
+        Finds the best parameters for the random forest algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = RandomForestClassifier()
     param_grid = { 'criterion': ['gini'], 'max_depth': [3, 4, 5, 6], 'n_estimators': np.arange(1, 1001, 10)}
     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
@@ -187,6 +241,13 @@ def grid_search_forest():
     print(best_clf.best_params_)
 
 def grid_search_svm():
+    """
+    @description
+        Finds the best parameters for the svm algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = SVC()
     param_grid = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid', ], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'gamma': [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]}
     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
@@ -195,6 +256,13 @@ def grid_search_svm():
     print(best_clf.best_params_)
 
 def grid_search_knn():
+    """
+    @description
+        Finds the best parameters for the knn algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = KNeighborsClassifier()
     param_grid = { 'n_neighbors': np.arange(1, 51), 'weights': ['uniform', 'distance'],
                    'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'], 'leaf_size': np.arange(1, 51),
@@ -206,6 +274,13 @@ def grid_search_knn():
 
 
 def grid_search_linear_discriminant():
+    """
+    @description
+        Finds the best parameters for the linear discriminant algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
     model = LinearDiscriminantAnalysis()
     param_grid = { 'solver': ['svd', 'lsqr', 'eigen']}
     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
