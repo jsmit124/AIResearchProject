@@ -170,7 +170,7 @@ def k_fold_cross_validation(model):
     :return: the average score.
     """
     scores = []
-    folds = StratifiedKFold(n_splits=100)
+    folds = StratifiedKFold(n_splits=20)
     for train_index, test_index in folds.split(train, label):
         x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
         scores.append(get_score(model, x_train, x_test, y_train, y_test))
