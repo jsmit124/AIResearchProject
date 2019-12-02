@@ -1,9 +1,15 @@
 #!/usr/local/bin/python3.7.4
-
+"""
+@description
+    This script takes a data set with drug use and uses 'Age', 'Education', 'Country', 'Ethnicity', 'Alcohol',
+    'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
+    'Nicotine' to predict gender. The data is run through seven models and the accuracy score of
+    each model is printed to the console.
+"""
 import warnings
-
 import numpy as np
 import pandas as pd
+
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
