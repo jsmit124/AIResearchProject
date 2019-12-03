@@ -353,10 +353,9 @@ main()
 # logistic regression  65.5   65.6   65.5   65.6   65.8    65.9   65.9   66.0   65.9   66.0
 # decision tree        61.4   65.0   64.7   65.8   64.7    65.0   64.4   65.7   64.8   65.5
 # random forest        65.3   64.6   64.9   65.5   65.9    65.7   65.6   66.0   66.4   65.8
-# svc                  65.4   65.3   65.7   66.6   66.7    66.2   66.0   66.2   66.7   66.9
 # knn                  63.6   64.1   65.3   65.0   65.2    65.2   65.1   64.8   64.9   65.1
 # linear_discriminant  64.2   64.3   64.5   65.1   65.2    65.3   65.5   65.3   65.4   65.6
-# gaussian             63.7   63.8   63.8   63.9   64.1    64.2   64.0   64.1   64.0   64.2
+
 
 # hyperparameters tuned with grid search
 # logistic regression {'C': 0.001, 'penalty': l2, 'solver': liblinear}
