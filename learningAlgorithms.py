@@ -9,8 +9,8 @@
 import warnings
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_squared_error
 
+from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
@@ -20,6 +20,9 @@ from sklearn.model_selection import StratifiedKFold, GridSearchCV
 from sklearn.preprocessing import LabelEncoder
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn import metrics
 
 warnings.filterwarnings("ignore")
 
@@ -265,12 +268,52 @@ def grid_search_linear_discriminant():
     best_clf = clf.fit(train_train, the_label)
     print(best_clf.best_params_)
 
+def ada_boost(train, label):
+    """
+    @description
+        Gets the accuracy score for the ada boost model
+    @author
+        Tristen Rivera
+    @:parameter
+    :param train: The model to test
+    :param label: The label to test the model by
+    :return: The accuracy of the model
+    """
+    
+    X_train, X_test, y_train, y_test = train_test_split(train, label, test_size=0.3)
+
+    # Create adaboost classifer object
+    abc = AdaBoostClassifier(n_estimators=50, learning_rate=1)
+
+    # Train Adaboost Classifer
+    model = abc.fit(X_train, y_train)
+
+    #Predict the response for test dataset
+    y_pred = model.predict(X_test)
+
+    print("Ada Boost accuracy is: {}%".format(round(metrics.accuracy_score(y_test, y_pred) * 100.0,1)))
+
 
 def main():
     """ @description
         The main entry point for the program
     """
     k = [2, 3, 5, 7, 9, 10, 15, 20, 50, 100]
+
+    print("ADA BOOST", sep="---")
+    print("MSE Train")
+    for i in k:
+        print(i)
+        ada_boost(train_train, train_label)
+    print("MSE Validation")
+    for i in k:
+        print(i)
+        ada_boost(validation_train, validation_label)
+    print("MSE Test")
+    for i in k:
+        print(i)
+        ada_boost(test_train, test_label)
+        
     print("LOGISTIC REGRESSION", sep="---")
     print("MSE Train")
     for i in k:
