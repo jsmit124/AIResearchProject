@@ -109,21 +109,6 @@ def random_forest_algorithm(k, train, label):
 
     print('Random forest accuracy is: {}%'.format(round(score, 1)))
 
-def svm_algorithm(k, train, label):
-    """
-    @description
-        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
-    @author
-        Aaron Merrell
-    :return: The accuracy of the model.
-    """
-    svc = SVC()
-    # the_label = np.ravel(label)
-    # svc.fit(train, the_label)
-
-    score = k_fold_cross_validation(svc, k, train, label)
-
-    print('svm accuracy is: {}%'.format(round(score, 1)))
 
 def knn_algorithm(k, train, label):
     """
@@ -141,21 +126,6 @@ def knn_algorithm(k, train, label):
 
     print('knn accuracy is: {}%'.format(round(score, 1)))
 
-def gaussian_algorithm(k, train, label):
-    """
-    @description
-        uses the SVC model to predict the gender of the constituent based on the drugs they've consumed.
-    @author
-        Aaron Merrell
-    :return: The accuracy of the model.
-    """
-    gnb = GaussianNB()
-    # the_label = np.ravel(label)
-    # gnb.fit(train, the_label)
-
-    score = k_fold_cross_validation(gnb, k, train, label)
-
-    print('gaussian accuracy is: {}%'.format(round(score, 1)))
 
 def linear_discriminant_algorithm(k, train, label):
     """
@@ -171,7 +141,7 @@ def linear_discriminant_algorithm(k, train, label):
 
     score = k_fold_cross_validation(lda, k, train, label)
 
-    print('Random forest accuracy is: {}%'.format(round(score, 1)))
+    print('Linear Discriminant accuracy is: {}%'.format(round(score, 1)))
 
 
 
@@ -185,24 +155,15 @@ def k_fold_cross_validation(model, k, train, label):
     :return: the average score.
     """
     scores = []
-    # errors = []
     folds = StratifiedKFold(n_splits=k)
     for train_index, test_index in folds.split(train, label):
         x_train, x_test, y_train, y_test = train.iloc[train_index], train.iloc[test_index], label.iloc[train_index], label.iloc[test_index]
         scores.append(get_score(model, x_train, x_test, y_train, y_test))
-        # y_pred = model.predict(x_test)
-        # errors.append(error(y_test, y_pred))
 
     avg = 0
     for i in scores:
         avg += i
     avg = (avg / len(scores)) * 100
-
-    # err = 0
-    # for i in errors:
-    #     err += i
-    # avg_err = (err / )
-
     return avg
 
 
@@ -224,105 +185,85 @@ def get_score(model, x_train, x_test, y_train, y_test):
     return model.score(x_test, y_test)
 
 
-# def error(y_true, y_pred):
-#     mse = mean_squared_error(y_true=y_true, y_pred=y_pred)
-#     print('MSE: %2.3f' % mse)
-#     return mse
+def grid_search_logistic():
+    """
+    @description
+        Finds the best parameters for the logistic algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
+    model = LogisticRegression()
+    param_grid = [{'solver': ['newton-cg', 'lbfgs', 'sag', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l2', 'none']},
+                  {'solver': ['liblinear', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l1', 'l2']}]
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(train_label)
+    best_clf = clf.fit(train_train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_decision():
+    """
+    @description
+        Finds the best parameters for the decision tree algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
+    model = DecisionTreeClassifier()
+    param_grid = {'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'max_leaf_nodes': [5, 10, 20, 50, 100]}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(train_label)
+    best_clf = clf.fit(train_train, the_label)
+    print(best_clf.best_params_)
+
+def grid_search_forest():
+    """
+    @description
+        Finds the best parameters for the random forest algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
+    model = RandomForestClassifier()
+    param_grid = { 'criterion': ['gini'], 'max_depth': [3, 4, 5, 6], 'n_estimators': np.arange(1, 1001, 10)}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(train_label)
+    best_clf = clf.fit(train_train, the_label)
+    print(best_clf.best_params_)
 
 
-# def grid_search_logistic():
-#     """
-#     @description
-#         Finds the best parameters for the logistic algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = LogisticRegression()
-#     param_grid = [{'solver': ['newton-cg', 'lbfgs', 'sag', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l2', 'none']},
-#                   {'solver': ['liblinear', 'saga'], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'penalty': ['l1', 'l2']}]
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
-#
-# def grid_search_decision():
-#     """
-#     @description
-#         Finds the best parameters for the decision tree algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = DecisionTreeClassifier()
-#     param_grid = {'criterion': ['gini', 'entropy'], 'max_depth': np.arange(1, 51), 'max_leaf_nodes': [5, 10, 20, 50, 100]}
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
-#
-# def grid_search_forest():
-#     """
-#     @description
-#         Finds the best parameters for the random forest algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = RandomForestClassifier()
-#     param_grid = { 'criterion': ['gini'], 'max_depth': [3, 4, 5, 6], 'n_estimators': np.arange(1, 1001, 10)}
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
-#
-# def grid_search_svm():
-#     """
-#     @description
-#         Finds the best parameters for the svm algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = SVC()
-#     param_grid = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid', ], 'C': [0.001, 0.01, 0.1, 1, 10, 100, 1000], 'gamma': [0.00001, 0.0001, 0.001, 0.01, 0.1, 1]}
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
-#
-# def grid_search_knn():
-#     """
-#     @description
-#         Finds the best parameters for the knn algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = KNeighborsClassifier()
-#     param_grid = { 'n_neighbors': np.arange(1, 51), 'weights': ['uniform', 'distance'],
-#                    'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'], 'leaf_size': np.arange(1, 51),
-#                    'p': [1, 2], 'metric': ['minkowski']}
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
-#
-#
-# def grid_search_linear_discriminant():
-#     """
-#     @description
-#         Finds the best parameters for the linear discriminant algorithm.
-#     @author
-#         Aaron Merrell
-#     :return: A dictionary with the best parameters.
-#     """
-#     model = LinearDiscriminantAnalysis()
-#     param_grid = { 'solver': ['svd', 'lsqr', 'eigen']}
-#     clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
-#     the_label = np.ravel(label)
-#     best_clf = clf.fit(train, the_label)
-#     print(best_clf.best_params_)
+def grid_search_knn():
+    """
+    @description
+        Finds the best parameters for the knn algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
+    model = KNeighborsClassifier()
+    param_grid = { 'n_neighbors': np.arange(1, 51), 'weights': ['uniform', 'distance'],
+                   'algorithm': ['ball_tree', 'kd_tree', 'brute', 'auto'], 'leaf_size': np.arange(1, 51),
+                   'p': [1, 2], 'metric': ['minkowski']}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(train_label)
+    best_clf = clf.fit(train_train, the_label)
+    print(best_clf.best_params_)
+
+
+def grid_search_linear_discriminant():
+    """
+    @description
+        Finds the best parameters for the linear discriminant algorithm.
+    @author
+        Aaron Merrell
+    :return: A dictionary with the best parameters.
+    """
+    model = LinearDiscriminantAnalysis()
+    param_grid = { 'solver': ['svd', 'lsqr', 'eigen']}
+    clf = GridSearchCV(model, param_grid=param_grid, cv=5, n_jobs=1)
+    the_label = np.ravel(train_label)
+    best_clf = clf.fit(train_train, the_label)
+    print(best_clf.best_params_)
 
 
 def main():
@@ -330,21 +271,21 @@ def main():
         The main entry point for the program
     """
     k = [2, 3, 5, 7, 9, 10, 15, 20, 50, 100]
-    # print("LOGISTIC REGRESSION", sep="---")
-    # print("MSE Train")
-    # for i in k:
-    #     print(i)
-    #     logistic_regression_algorithm(i, train_train, train_label)
-    # print("MSE Validation")
-    # for i in k:
-    #     print(i)
-    #     logistic_regression_algorithm(i, validation_train, validation_label)
-    # print("MSE Test")
-    # for i in k:
-    #     print(i)
-    #     logistic_regression_algorithm(i, test_train, test_label)
-    #
-    # print("")
+    print("LOGISTIC REGRESSION", sep="---")
+    print("MSE Train")
+    for i in k:
+        print(i)
+        logistic_regression_algorithm(i, train_train, train_label)
+    print("MSE Validation")
+    for i in k:
+        print(i)
+        logistic_regression_algorithm(i, validation_train, validation_label)
+    print("MSE Test")
+    for i in k:
+        print(i)
+        logistic_regression_algorithm(i, test_train, test_label)
+
+    print("")
     print("DECISION TREE", sep="---")
     print("MSE Train")
     for i in k:
@@ -375,21 +316,6 @@ def main():
         random_forest_algorithm(i, test_train, test_label)
 
     print("")
-    print("SVC", sep="---")
-    print("MSE Train")
-    for i in k:
-        print(i)
-        svm_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        svm_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        svm_algorithm(i, test_train, test_label)
-
-    print("")
     print("KNN", sep="---")
     print("MSE Train")
     for i in k:
@@ -418,21 +344,6 @@ def main():
     for i in k:
         print(i)
         linear_discriminant_algorithm(i, test_train, test_label)
-
-    print("")
-    print("GAUSSIAN", sep="---")
-    print("MSE Train")
-    for i in k:
-        print(i)
-        gaussian_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        gaussian_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        gaussian_algorithm(i, test_train, test_label)
 
 
 main()
