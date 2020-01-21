@@ -24,7 +24,6 @@ with open('drug_consumption.csv') as csv_file:
     
     for row in csv_reader:
         if line_count == 0:
-            print(type(row))
             line_count += 1
         else:
             recordNumber = str(row[0])
