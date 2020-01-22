@@ -26,21 +26,18 @@ from sklearn import metrics
 
 warnings.filterwarnings("ignore")
 
-# data = pd.read_csv("drug_consumption.csv")
-test_data = pd.read_csv("test_data.csv")
-train_data = pd.read_csv("train_data.csv")
-validation_data = pd.read_csv("validation_data.csv")
+# data = pd.read_csv("ClassifiedDrugData.csv")
+test_data = pd.read_csv("sortedData/ClassifiedDrugData.csv")
+train_data = pd.read_csv("sortedData/ClassifiedDrugData.csv")
+validation_data = pd.read_csv("sortedData/ClassifiedDrugData.csv")
 
-test_train = test_data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
-                   'Nicotine']]
-train_train = train_data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
-                    'Nicotine']]
-validation_train = validation_data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
-                         'Nicotine']]
+test_train = test_data[['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore', 'Impulsive', 'SS']]
+train_train = train_data[['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore', 'Impulsive', 'SS']]
+validation_train = validation_data[['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore', 'Impulsive', 'SS']]
 
-test_label = test_data[['Gender']]
-train_label = train_data[['Gender']]
-validation_label = validation_data[['Gender']]
+test_label = test_data[['Classifier']]
+train_label = train_data[['Classifier']]
+validation_label = validation_data[['Classifier']]
 
 # train = data[['Age', 'Education', 'Country', 'Ethnicity', 'Alcohol', 'Cannabis', 'Cocaine', 'Crack', 'Ecstasy', 'Heroin', 'Ketamine', 'LSD', 'Meth', 'Mushrooms',
 #               'Nicotine']]
@@ -53,7 +50,7 @@ def logistic_regression_algorithm(k, train, label):
         @author
             Tristen, Justin
     """
-    model = LogisticRegression(solver='liblinear', penalty='l2', C=0.001)
+    model = LogisticRegression(solver='saga', penalty='l1', C=1)
     # model.fit(train, label)
 
     score = k_fold_cross_validation(model, k, train, label)
@@ -88,7 +85,7 @@ def decision_tree_algorithm(k, train, label):
     # x = data.iloc[:, [1, 2, 3, 4, 12, 17, 19, 20, 21, 22, 23, 25, 26, 27, 28]]
     # y = data.iloc[:, 31]
 
-    tree_classifier = DecisionTreeClassifier(criterion='gini', max_depth=3, max_leaf_nodes=10)
+    tree_classifier = DecisionTreeClassifier(criterion='gini', max_depth=8, max_leaf_nodes=50)
     # tree_classifier.fit(x, y)
 
     score = k_fold_cross_validation(tree_classifier, k, train, label)
@@ -104,7 +101,7 @@ def random_forest_algorithm(k, train, label):
         Aaron Merrell
      :return: The accuracy of the model.
     """
-    classifier = RandomForestClassifier(criterion='gini', max_depth=4, n_estimators=10)
+    classifier = RandomForestClassifier(criterion='gini', max_depth=5, n_estimators=31)
     # the_label = np.ravel(label)
     # classifier.fit(train, the_label)
 
@@ -121,7 +118,7 @@ def knn_algorithm(k, train, label):
         Aaron Merrell
     :return: The accuracy of the model.
     """
-    knn = KNeighborsClassifier(algorithm='ball_tree', leaf_size=6, metric='minkowski', n_neighbors=25, p=2, weights='uniform')
+    knn = KNeighborsClassifier(algorithm='ball_tree', leaf_size=1, metric='minkowski', n_neighbors=19, p=2, weights='distance')
     # the_label = np.ravel(label)
     # knn.fit(train, the_label)
 
@@ -305,28 +302,29 @@ def main():
     for i in k:
         print(i)
         ada_boost(train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        ada_boost(validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        ada_boost(test_train, test_label)
-        
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     ada_boost(validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     ada_boost(test_train, test_label)
+
+    print("")
     print("LOGISTIC REGRESSION", sep="---")
     print("MSE Train")
     for i in k:
         print(i)
         logistic_regression_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        logistic_regression_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        logistic_regression_algorithm(i, test_train, test_label)
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     logistic_regression_algorithm(i, validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     logistic_regression_algorithm(i, test_train, test_label)
 
     print("")
     print("DECISION TREE", sep="---")
@@ -334,14 +332,14 @@ def main():
     for i in k:
         print(i)
         decision_tree_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        decision_tree_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        decision_tree_algorithm(i, test_train, test_label)
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     decision_tree_algorithm(i, validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     decision_tree_algorithm(i, test_train, test_label)
 
     print("")
     print("RANDOM FOREST", sep="---")
@@ -349,14 +347,14 @@ def main():
     for i in k:
         print(i)
         random_forest_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        random_forest_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        random_forest_algorithm(i, test_train, test_label)
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     random_forest_algorithm(i, validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     random_forest_algorithm(i, test_train, test_label)
 
     print("")
     print("KNN", sep="---")
@@ -364,14 +362,14 @@ def main():
     for i in k:
         print(i)
         knn_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        knn_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        knn_algorithm(i, test_train, test_label)
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     knn_algorithm(i, validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     knn_algorithm(i, test_train, test_label)
 
     print("")
     print("LINEAR DISCRIMINANT", sep="---")
@@ -379,30 +377,31 @@ def main():
     for i in k:
         print(i)
         linear_discriminant_algorithm(i, train_train, train_label)
-    print("MSE Validation")
-    for i in k:
-        print(i)
-        linear_discriminant_algorithm(i, validation_train, validation_label)
-    print("MSE Test")
-    for i in k:
-        print(i)
-        linear_discriminant_algorithm(i, test_train, test_label)
+    # print("MSE Validation")
+    # for i in k:
+    #     print(i)
+    #     linear_discriminant_algorithm(i, validation_train, validation_label)
+    # print("MSE Test")
+    # for i in k:
+    #     print(i)
+    #     linear_discriminant_algorithm(i, test_train, test_label)
 
 
 main()
 
 
 # folds                 2      3      5      7      9       10     15     20     50     100
-# logistic regression  65.5   65.6   65.5   65.6   65.8    65.9   65.9   66.0   65.9   66.0
-# decision tree        61.4   65.0   64.7   65.8   64.7    65.0   64.4   65.7   64.8   65.5
-# random forest        65.3   64.6   64.9   65.5   65.9    65.7   65.6   66.0   66.4   65.8
-# knn                  63.6   64.1   65.3   65.0   65.2    65.2   65.1   64.8   64.9   65.1
-# linear_discriminant  64.2   64.3   64.5   65.1   65.2    65.3   65.5   65.3   65.4   65.6
+# ada boost            77.4   78.4   80.4   79.0   79.2    80.2   78.6   77.7   79.5   78.8
+# logistic regression  79.0   78.3   79.1   79.6   79.5    79.6   79.9   80.1   80.2   80.3
+# decision tree        74.8   75.8   77.2   75.9   76.7    76.7   75.9   77.7   77.5   77.0
+# random forest        78.1   76.9   78.5   78.7   79.7    79.3   79.1   79.4   79.3   79.9
+# knn                  78.7   77.5   79.2   79.9   79.3    79.5   79.8   80.1   80.1   79.9
+# linear_discriminant  78.5   76.8   78.4   79.1   79.1    79.0   79.5   79.6   79.8   79.9
 
 
 # hyperparameters tuned with grid search
-# logistic regression {'C': 0.001, 'penalty': l2, 'solver': liblinear}
-# decision tree {'criterion': gini, 'max_depth': 3, 'max_leaf_nodes': 10}
-# random forest {'criterion: 'gini', 'max_depth': 4, 'n_estimators': 10}
-# knn {'algorithm': 'ball_tree', 'leaf_size': 6, 'metric': 'minkowski', 'n_neighbors': 25, 'p': 2, 'weights': 'uniform'}
+# logistic regression {'C': 1, 'penalty': l1, 'solver': saga}
+# decision tree {'criterion': gini, 'max_depth': 8, 'max_leaf_nodes': 50}
+# random forest {'criterion: 'gini', 'max_depth': 5, 'n_estimators': 31}
+# knn {'algorithm': 'ball_tree', 'leaf_size': 1, 'metric': 'minkowski', 'n_neighbors': 19, 'p': 2, 'weights': 'distance'}
 # linear_discriminant {'solver': 'svd'}
