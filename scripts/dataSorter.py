@@ -8,7 +8,7 @@ noLegalDrugButIllegalDrugData = queue.Queue()
 classifiedDrugData = queue.Queue()
 
 header = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Alcohol", "Cannabis", "Nicotine", "Amphet", "Amyl", "Benzos", "Cocaine", "Crack", "Ecstasy", "Heroin", "Ketamine", "LSD", "Meth", "Mushrooms", "Semeron", "VolatileSubstance"]
-classifiedHeader = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Classifier"]
+classifiedHeader = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Class00", "Class10", "Class01", "Class11"]
 
 noDrugData.put(header)
 legalDrugNoIllegalDrugData.put(header)
@@ -18,7 +18,7 @@ classifiedDrugData.put(classifiedHeader)
 
 comma = ", "
 
-with open('drug_consumption.csv') as csv_file:
+with open('../drug_consumption.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0
     
@@ -60,23 +60,34 @@ with open('drug_consumption.csv') as csv_file:
             didLegalDrugs = alcohol + cannabis + nicotine
             didIllegalDrugs = amphetamines + amyl + benzos + cocaine + crack + ecstacy + heroin + ketamine + lsd + meth + mushrooms + semeron + volatileSubstances
 
-            classifier = 0
+            # never used any drugs
+            class00 = 0
+            # only used legal drugs
+            class10 = 0
+            # only used illegal drugs
+            class01 = 0
+            # use both legal and illegal drugs
+            class11 = 0
+
             
             if didLegalDrugs == 0 and didIllegalDrugs == 0:
+                class00 += 1
                 noDrugData.put(row)
 
             if didLegalDrugs > 0 and didIllegalDrugs == 0:
+                class10 += 1
                 legalDrugNoIllegalDrugData.put(row)
 
             if didLegalDrugs > 0 and didIllegalDrugs > 0:
-                classifier += 1
+                class11 += 1
                 legalDrugAndIllegalDrugData.put(row)
 
             #not including data who didn't do legal drugs but did do illegal drugs in classifier
             if didLegalDrugs == 0 and didIllegalDrugs > 0:
+                class01 += 1
                 noLegalDrugButIllegalDrugData.put(row)
 
-            info = [recordNumber, age, gender, education, country, ethnicity, nscore, escore, oscore, ascore, cscore, impulsive, ss, str(classifier)]
+            info = [recordNumber, age, gender, education, country, ethnicity, nscore, escore, oscore, ascore, cscore, impulsive, ss, str(class00), str(class10), str(class01), str(class11)]
             classifiedDrugData.put(info)
 
             line_count += 1
@@ -84,27 +95,27 @@ with open('drug_consumption.csv') as csv_file:
     print(f'Processed {line_count} lines.')
 
 
-with open('sortedData/legalDrugNoIllegalDrugData.csv', mode='w', newline='') as file:
+with open('../sortedData/legalDrugNoIllegalDrugData.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',', )
     for data in range(0, legalDrugNoIllegalDrugData.qsize()):
         writer.writerow(legalDrugNoIllegalDrugData.get())
 
-with open('sortedData/noDrugData.csv', mode='w', newline='') as file:
+with open('../sortedData/noDrugData.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',')
     for data in range(0, noDrugData.qsize()):
         writer.writerow(noDrugData.get())
 
-with open('sortedData/LegalDrugAndIllegalDrugData.csv', mode='w', newline='') as file:
+with open('../sortedData/LegalDrugAndIllegalDrugData.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',')
     for data in range(0, legalDrugAndIllegalDrugData.qsize()):
         writer.writerow(legalDrugAndIllegalDrugData.get())
 
-with open('sortedData/noLegalButDidIllegalDrugData.csv', mode='w', newline='') as file:
+with open('../sortedData/noLegalButDidIllegalDrugData.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',')
     for data in range(0, noLegalDrugButIllegalDrugData.qsize()):
         writer.writerow(noLegalDrugButIllegalDrugData.get())
 
-with open('sortedData/ClassifiedDrugData.csv', mode='w', newline='') as file:
+with open('../sortedData/ClassedDrugData.csv', mode='w', newline='') as file:
     writer = csv.writer(file, delimiter=',')
     for data in range(0, classifiedDrugData.qsize()):
         writer.writerow(classifiedDrugData.get())
