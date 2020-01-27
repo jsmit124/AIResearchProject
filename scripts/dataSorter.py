@@ -8,7 +8,7 @@ noLegalDrugButIllegalDrugData = queue.Queue()
 classifiedDrugData = queue.Queue()
 
 header = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Alcohol", "Cannabis", "Nicotine", "Amphet", "Amyl", "Benzos", "Cocaine", "Crack", "Ecstasy", "Heroin", "Ketamine", "LSD", "Meth", "Mushrooms", "Semeron", "VolatileSubstance"]
-classifiedHeader = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Class00", "Class10", "Class01", "Class11"]
+classifiedHeader = ["RecordNumber", "Age", "Gender", "Education", "Country", "Ethnicity", "Nscore", "Escore", "Oscore", "Ascore", "Cscore", "Impulsive", "SS", "Class00", "Class10", "Class01", "Class11", "ClassLegal", "ClassIllegal"]
 
 noDrugData.put(header)
 legalDrugNoIllegalDrugData.put(header)
@@ -68,6 +68,10 @@ with open('../drug_consumption.csv') as csv_file:
             class01 = 0
             # use both legal and illegal drugs
             class11 = 0
+            # used legal drugs
+            classLegal = 0
+            #used illegal drugs
+            classIllegal = 0
 
             
             if didLegalDrugs == 0 and didIllegalDrugs == 0:
@@ -82,12 +86,17 @@ with open('../drug_consumption.csv') as csv_file:
                 class11 += 1
                 legalDrugAndIllegalDrugData.put(row)
 
-            #not including data who didn't do legal drugs but did do illegal drugs in classifier
             if didLegalDrugs == 0 and didIllegalDrugs > 0:
                 class01 += 1
                 noLegalDrugButIllegalDrugData.put(row)
+                
+            if didLegalDrugs > 0:
+                classLegal += 1
+                
+            if didIllegalDrugs > 0:
+                classIllegal += 1
 
-            info = [recordNumber, age, gender, education, country, ethnicity, nscore, escore, oscore, ascore, cscore, impulsive, ss, str(class00), str(class10), str(class01), str(class11)]
+            info = [recordNumber, age, gender, education, country, ethnicity, nscore, escore, oscore, ascore, cscore, impulsive, ss, str(class00), str(class10), str(class01), str(class11), str(classLegal), str(classIllegal)]
             classifiedDrugData.put(info)
 
             line_count += 1
