@@ -24,18 +24,14 @@ from sklearn.tree import DecisionTreeClassifier
 
 warnings.filterwarnings("ignore")
 
-data = pd.read_csv("sortedData/ClassedDrugData.csv")
+data = pd.read_csv("../sortedData/ClassedDrugData.csv")
 
-if len(sys.argv) >= 2:
-    train_data = data[
-        ['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore',
-         'Impulsive', 'SS', 'Class10', 'Class01', 'Class11']]
-else:
-    train_data = data[
-        ['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore',
-         'Impulsive', 'SS']]
 
-label = data[['Class00']]
+train_data = data[
+    ['Age', 'Gender', 'Education', 'Country', 'Ethnicity', 'Nscore', 'Escore', 'Oscore', 'Ascore', 'Cscore',
+     'Impulsive', 'SS']]
+
+label = data[['ClassLegal']]
 
 
 def logistic_regression_algorithm(k, train, label):
@@ -257,18 +253,12 @@ def main():
         scores.append(avg_f1)
     k_scores.put(scores)
 
-    if len(sys.argv) >= 2:
-        with open('./kFoldResults/crossValidationClass00WithLabelClassesResults.csv', mode='w', newline='') as file:
-            writer = csv.writer(file, delimiter=',', )
-            for data in range(0, k_scores.qsize()):
-                writer.writerow(k_scores.get())
-        file.close()
-    else:
-        with open('./kFoldResults/crossValidationClass00WithoutLabelClassesResults.csv', mode='w', newline='') as file:
-            writer = csv.writer(file, delimiter=',', )
-            for data in range(0, k_scores.qsize()):
-                writer.writerow(k_scores.get())
-        file.close()
+    
+    with open('../kFoldResults/crossValidationClassLegalResults.csv', mode='w', newline='') as file:
+        writer = csv.writer(file, delimiter=',', )
+        for data in range(0, k_scores.qsize()):
+            writer.writerow(k_scores.get())
+    file.close()
 
 
 main()
